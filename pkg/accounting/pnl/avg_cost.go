@@ -1,6 +1,7 @@
 package pnl
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/c9s/bbgo/pkg/types"
@@ -39,6 +40,7 @@ func (c *AverageCostCalculator) Calculate(symbol string, trades []types.Trade, c
 			if trade.IsBuyer {
 				bidVolume += trade.Quantity
 				bidAmount += trade.Price * trade.Quantity
+				fmt.Printf("buyVolume %f %f", trade.Quantity, bidVolume)
 			}
 
 			// since we use USDT as the quote currency, we simply check if it matches the currency symbol
@@ -81,6 +83,7 @@ func (c *AverageCostCalculator) Calculate(symbol string, trades []types.Trade, c
 
 		profit += (t.Price - averageCost) * t.Quantity
 		askVolume += t.Quantity
+		fmt.Printf("askVolume %f %f", t.Quantity, askVolume)
 	}
 
 	profit -= feeUSD
