@@ -2,6 +2,7 @@ package pnl
 
 import (
 	"strings"
+	"fmt"
 
 	"github.com/c9s/bbgo/pkg/types"
 )
@@ -80,6 +81,7 @@ func (c *AverageCostCalculator) Calculate(symbol string, trades []types.Trade, c
 		}
 
 		profit += (t.Price - averageCost) * t.Quantity
+		fmt.Printf("profit %d %d\n", (t.Price - averageCost) * t.Quantity, profit)
 		askVolume += t.Quantity
 	}
 
