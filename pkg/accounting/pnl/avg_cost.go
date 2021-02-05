@@ -75,13 +75,12 @@ func (c *AverageCostCalculator) Calculate(symbol string, trades []types.Trade, c
 			continue
 		}
 
-		if t.side == types.SideTypeBuy {
+		if t.Side == types.SideTypeBuy {
 			continue
 		}
 
 		profit += (t.Price - averageCost) * t.Quantity
 		askVolume += t.Quantity
-		fmt.Printf("askVolume %f %f\n", t.Quantity, askVolume)
 	}
 
 	profit -= feeUSD
