@@ -12,6 +12,7 @@ import (
 	"github.com/c9s/bbgo/pkg/types"
 
 	_ "github.com/go-sql-driver/mysql"
+	_ "modernc.org/sqlite"
 )
 
 var SupportedExchanges = []types.ExchangeName{"binance", "max", "ftx"}
