@@ -30,7 +30,7 @@ jobs:
           cd frontend
           yarn install
           cd ..
-          make dist
+          make dist VERSION=${{ steps.get_version.outputs.VERSION }}
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
