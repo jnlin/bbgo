@@ -106,7 +106,6 @@ $(DIST_DIR)/$(VERSION)/bbgo-$(VERSION)-darwin-amd64.tar.gz $(DIST_DIR)/$(VERSION
 	$(MAKE) bbgo-$(BIN_SUFFIX)
 	$(MAKE) bbgo-slim-$(BIN_SUFFIX)
 	tar -C $(BIN_DIR) -cvzf $@ $(BIN_NAME)
-	gpg --yes --detach-sign --armor $@
 
 dist-bbgo-linux: static $(DIST_DIR)/$(VERSION)/bbgo-$(VERSION)-linux-arm64.tar.gz $(DIST_DIR)/$(VERSION)/bbgo-$(VERSION)-linux-amd64.tar.gz
 dist-bbgo-darwin: static $(DIST_DIR)/$(VERSION)/bbgo-$(VERSION)-darwin-arm64.tar.gz $(DIST_DIR)/$(VERSION)/bbgo-$(VERSION)-darwin-amd64.tar.gz
