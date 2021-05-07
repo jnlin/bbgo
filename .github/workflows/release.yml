@@ -20,16 +20,14 @@ jobs:
         uses: actions/setup-go@v2
         with:
           go-version: 1.16.x
+      - name: Install Node
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
       - name: Build
         run: |
-          make bbgo-slim-linux-amd64
-          tar zcf build/bbgo-slim-linux-amd64.tgz build/bbgo/bbgo-slim-linux-amd64
-          make bbgo-slim-linux-arm64
-          tar zcf build/bbgo-slim-linux-arm64.tgz build/bbgo/bbgo-slim-linux-arm64
-          make bbgo-slim-darwin-amd64
-          tar zcf build/bbgo-slim-darwin-amd64.tgz build/bbgo/bbgo-slim-darwin-amd64
-          make bbgo-slim-darwin-arm64
-          tar zcf build/bbgo-slim-darwin-arm64.tgz build/bbgo/bbgo-slim-darwin-arm64
+          npm install --global yarn next
+          make dist
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -44,14 +42,50 @@ jobs:
             - Second Change
           draft: false
           prerelease: false
+      - name: Upload slim Linux amd64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tar.gz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tar.gz
+          asset_content_type: application/octet-stream
+      - name: Upload slim Linux arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-arm64.tar.gz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-arm64.tar.gz
+          asset_content_type: application/octet-stream
+      - name: Upload slim Darwin amd64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
+          asset_content_type: application/octet-stream
+      - name: Upload slim Darwin arm64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz
+          asset_content_type: application/octet-stream
       - name: Upload Linux amd64
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/bbgo-slim-linux-amd64.tgz
-          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tgz
+          asset_path: build/bbgo-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tar.gz
+          asset_name: bbgo-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Linux arm64
         uses: actions/upload-release-asset@v1
@@ -59,8 +93,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/bbgo-slim-linux-arm64.tgz
-          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-arm64.tgz
+          asset_path: build/bbgo-${{ steps.get_version.outputs.VERSION }}-linux-arm64.tar.gz
+          asset_name: bbgo-${{ steps.get_version.outputs.VERSION }}-linux-arm64.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Darwin amd64
         uses: actions/upload-release-asset@v1
@@ -68,8 +102,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/bbgo-slim-darwin-amd64.tgz
-          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tgz
+          asset_path: build/bbgo-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
+          asset_name: bbgo-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tar.gz
           asset_content_type: application/octet-stream
       - name: Upload Darwin arm64
         uses: actions/upload-release-asset@v1
@@ -77,6 +111,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: build/bbgo-slim-darwin-arm64.tgz
-          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tgz
+          asset_path: build/bbgo-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz
+          asset_name: bbgo-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tar.gz
           asset_content_type: application/octet-stream

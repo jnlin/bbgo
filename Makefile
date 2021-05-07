@@ -102,9 +102,7 @@ pack: static bbgo-linux bbgo-slim-linux bbgo-darwin bbgo-slim-darwin desktop
 		for platform in linux darwin ; do \
 			echo $$platform ; \
 			tar -C $(BIN_DIR) -cvzf $(DIST_DIR)/$(GIT_DESC)/bbgo-$(GIT_DESC)-$$platform-$$arch.tar.gz bbgo-$$platform-$$arch ; \
-			gpg --clearsign --armor $(DIST_DIR)/$(GIT_DESC)/bbgo-$(GIT_DESC)-$$platform-$$arch.tar.gz ; \
 			tar -C $(BIN_DIR) -cvzf $(DIST_DIR)/$(GIT_DESC)/bbgo-slim-$(GIT_DESC)-$$platform-$$arch.tar.gz bbgo-slim-$$platform-$$arch ; \
-			gpg --clearsign --armor $(DIST_DIR)/$(GIT_DESC)/bbgo-slim-$(GIT_DESC)-$$platform-$$arch.tar.gz ; \
 			done ; \
 		done
 
