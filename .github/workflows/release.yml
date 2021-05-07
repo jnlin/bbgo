@@ -9,7 +9,7 @@ name: Create Release
 jobs:
   release:
     name: Create Release
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     steps:
       - name: Get the version
         id: get_version
