@@ -11,6 +11,9 @@ jobs:
     name: Create Release
     runs-on: ubuntu-latest
     steps:
+      - name: Get the version
+        id: get_version
+        run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Install Go
@@ -48,7 +51,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/bbgo-slim-linux-amd64.tgz
-          asset_name: bbgo-slim-${{ github.ref.refs.tags }}-linux-amd64.tgz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-amd64.tgz
           asset_content_type: application/octet-stream
       - name: Upload Linux arm64
         uses: actions/upload-release-asset@v1
@@ -57,7 +60,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/bbgo-slim-linux-arm64.tgz
-          asset_name: bbgo-slim-${{ github.ref.refs.tags }}-linux-arm64.tgz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-linux-arm64.tgz
           asset_content_type: application/octet-stream
       - name: Upload Darwin amd64
         uses: actions/upload-release-asset@v1
@@ -66,7 +69,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/bbgo-slim-darwin-amd64.tgz
-          asset_name: bbgo-slim-${{ github.ref.refs.tags }}-darwin-amd64.tgz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-amd64.tgz
           asset_content_type: application/octet-stream
       - name: Upload Darwin arm64
         uses: actions/upload-release-asset@v1
@@ -75,5 +78,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/bbgo-slim-darwin-arm64.tgz
-          asset_name: bbgo-slim-${{ github.ref.refs.tags }}-darwin-arm64.tgz
+          asset_name: bbgo-slim-${{ steps.get_version.outputs.VERSION }}-darwin-arm64.tgz
           asset_content_type: application/octet-stream
