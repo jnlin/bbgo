@@ -26,6 +26,9 @@ jobs:
           node-version: "16"
       - name: Build
         run: |
+          cd frontend
+          npm install
+          cd ..
           npm install --global yarn next
           make dist
       - name: Create Release
