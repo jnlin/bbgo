@@ -28,7 +28,7 @@ jobs:
         run: |
           npm install --global yarn
           (cd frontend && yarn install)
-          make dist VERSION=${{ steps.get_version.outputs.VERSION }}
+          VERSION=${{ steps.get_version.outputs.VERSION }} make dist
         shell: bash
       - name: Create Release
         id: create_release
