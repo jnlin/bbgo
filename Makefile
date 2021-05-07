@@ -102,7 +102,7 @@ dist-bbgo-linux: bbgo-linux bbgo-slim-linux
 dist-bbgo-darwin: bbgo-darwin bbgo-slim-darwin
 
 pack: static dist-bbgo-linux dist-bbgo-darwin desktop
-	mkdir -p $(DIST_DIR)/$(GIT_DESC)
+	mkdir -p $(DIST_DIR)/$(VERSION)
 	for arch in amd64 arm64 ; do \
 		for platform in linux darwin ; do \
 			echo $$platform ; \
