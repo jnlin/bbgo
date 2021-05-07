@@ -19,8 +19,14 @@ jobs:
           go-version: 1.15.x
       - name: Build
         run: |
-          make bbgo-slim-linux
+          make TARGET_ARCH=amd64 bbgo-slim-linux
           tar zcf build/bbgo-slim-linux-amd64.tgz build/bbgo/bbgo-slim-linux
+          make TARGET_ARCH=arm64 bbgo-slim-linux
+          tar zcf build/bbgo-slim-linux-arm64.tgz build/bbgo/bbgo-slim-linux
+          make TARGET_ARCH=amd64 bbgo-slim-darwin
+          tar zcf build/bbgo-slim-darwin-amd64.tgz build/bbgo/bbgo-slim-darwin
+          make TARGET_ARCH=arm64 bbgo-slim-linux
+          tar zcf build/bbgo-slim-darwin-arm64.tgz build/bbgo/bbgo-slim-darwin
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -28,20 +34,43 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          release_name: BBGO ${{ github.ref }}
           body: |
             TODO: Fill changes in this Release
             - First Change
             - Second Change
           draft: false
           prerelease: false
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - name: Upload Release Assets
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: build/bbgo-slim-linux-amd64.tgz
-          asset_name: bbgo-slim-linux-amd64.tgz
+          asset_name: bbgo-slim-${{ github.ref }}-linux-amd64.tgz
           asset_content_type: application/octet-stream
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-linux-arm64.tgz
+          asset_name: bbgo-slim-${{ github.ref }}-linux-arm64.tgz
+          asset_content_type: application/octet-stream
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-darwin-amd64.tgz
+          asset_name: bbgo-slim-${{ github.ref }}-darwin-amd64.tgz
+          asset_content_type: application/octet-stream
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/bbgo-slim-darwin-arm64.tgz
+          asset_name: bbgo-slim-${{ github.ref }}-darwin-arm64.tgz
+          asset_content_type: application/octet-stream  
