@@ -19,14 +19,14 @@ jobs:
           go-version: 1.15.x
       - name: Build
         run: |
-          make TARGET_ARCH=amd64 bbgo-slim-linux
-          tar zcf build/bbgo-slim-linux-amd64.tgz build/bbgo/bbgo-slim-linux
-          make TARGET_ARCH=arm64 bbgo-slim-linux
-          tar zcf build/bbgo-slim-linux-arm64.tgz build/bbgo/bbgo-slim-linux
-          make TARGET_ARCH=amd64 bbgo-slim-darwin
-          tar zcf build/bbgo-slim-darwin-amd64.tgz build/bbgo/bbgo-slim-darwin
-          make TARGET_ARCH=arm64 bbgo-slim-linux
-          tar zcf build/bbgo-slim-darwin-arm64.tgz build/bbgo/bbgo-slim-darwin
+          make bbgo-slim-linux-amd64
+          tar zcf build/bbgo-slim-linux-amd64.tgz build/bbgo/bbgo-slim-linux-amd64
+          make bbgo-slim-linux-arm64
+          tar zcf build/bbgo-slim-linux-arm64.tgz build/bbgo/bbgo-slim-linux-arm64
+          make bbgo-slim-darwin-amd64
+          tar zcf build/bbgo-slim-darwin-amd64.tgz build/bbgo/bbgo-slim-darwin-amd64
+          make bbgo-slim-darwin-arm64
+          tar zcf build/bbgo-slim-darwin-arm64.tgz build/bbgo/bbgo-slim-darwin-arm64
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
