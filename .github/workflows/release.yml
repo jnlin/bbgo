@@ -26,10 +26,10 @@ jobs:
           node-version: "16"
       - name: Build
         run: |
+          npm install --global yarn
           cd frontend
-          npm install
+          yarn install
           cd ..
-          npm install --global yarn next
           make dist
       - name: Create Release
         id: create_release
