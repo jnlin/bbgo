@@ -202,9 +202,9 @@ func (s *Strategy) check(ctx context.Context, _ bbgo.OrderExecutionRouter) {
 	// bid price MUST BE GREATER than ask price
 	spreadRatio := feeBidPrice.Div(feeAskPrice).Float64()
 
-	// the spread ratio must be greater than 1.001 because of the high taker fee
-	if spreadRatio <= 1.001 {
-		// return
+	// the spread ratio must be greater than 1.000 because of the high taker fee
+	if spreadRatio <= 1.000 {
+		return
 	}
 
 	minSpreadRatio := s.MinSpreadRatio.Float64()
@@ -318,7 +318,16 @@ func (s *Strategy) check(ctx context.Context, _ bbgo.OrderExecutionRouter) {
 
 	// check if orders are completed
 	var waitFactor time.Duration = 1
+	var timeout = time.After(5 * time.Second)
 	for s.orderStore.NumOfOrders() > 0 {
+		select {
+		case <-timeout:
+			break
+		case <-ctx.Done():
+			break
+		default:
+		}
+
 		// waiting orders to be completed
 		log.Infof("%s waiting order updates...", s.Symbol)
 		time.Sleep(100 * time.Millisecond * waitFactor)
@@ -326,10 +335,33 @@ func (s *Strategy) check(ctx context.Context, _ bbgo.OrderExecutionRouter) {
 	}
 
 	s.Notifiability.Notify("%s market orders are filled and removed", s.Symbol)
+
+	trades := s.tradeStore.GetAndClear()
+	for _, trade := range trades {
+		s.processTrade(trade)
+	}
+
 	s.state.Position.Reset()
 }
 
-func (s *Strategy) handleTradeUpdate(trade types.Trade) {
+func (s *Strategy) handleTrade(trade types.Trade) {
+	s.tradeC <- trade
+}
+
+func (s *Strategy) collectTrades(ctx context.Context) {
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case trade := <-s.tradeC:
+			s.tradeStore.Add(trade)
+
+		}
+	}
+}
+
+func (s *Strategy) processTrade(trade types.Trade) {
 	if !s.orderStore.Exists(trade.OrderID) {
 		return
 	}
@@ -457,6 +489,7 @@ func (s *Strategy) CrossRun(ctx context.Context, orderExecutionRouter bbgo.Order
 	// buffer 100 trades in the channel
 	s.tradeC = make(chan types.Trade, 100)
 	s.tradeStore = bbgo.NewTradeStore(s.Symbol)
+	go s.collectTrades(ctx)
 
 	// we're using market order, market orders will be finally filled
 	s.orderStore.RemoveFilled = true
@@ -483,7 +516,7 @@ func (s *Strategy) CrossRun(ctx context.Context, orderExecutionRouter bbgo.Order
 		book.BindStream(session.MarketDataStream)
 		s.books[sessionID] = book
 
-		session.UserDataStream.OnTradeUpdate(s.handleTradeUpdate)
+		session.UserDataStream.OnTradeUpdate(s.handleTrade)
 
 		s.orderStore.BindStream(session.UserDataStream)
 
