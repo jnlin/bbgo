@@ -82,9 +82,10 @@ type Strategy struct {
 
 	state *State
 
-	orderStore *bbgo.OrderStore
-	tradeStore *bbgo.TradeStore
-	tradeC     chan types.Trade
+	activeMakerOrders *bbgo.LocalActiveOrderBook
+	orderStore        *bbgo.OrderStore
+	tradeStore        *bbgo.TradeStore
+	tradeC            chan types.Trade
 
 	groupID uint32
 
@@ -319,7 +320,7 @@ func (s *Strategy) check(ctx context.Context, _ bbgo.OrderExecutionRouter) {
 	// check if orders are completed
 	var waitFactor time.Duration = 1
 	var timeout = time.After(5 * time.Second)
-	for s.orderStore.NumOfOrders() > 0 {
+	for s.activeMakerOrders.NumOfOrders() > 0 {
 		select {
 		case <-timeout:
 			break
@@ -329,7 +330,7 @@ func (s *Strategy) check(ctx context.Context, _ bbgo.OrderExecutionRouter) {
 		}
 
 		// waiting orders to be completed
-		log.Infof("%s waiting order updates...", s.Symbol)
+		log.Infof("%s waiting for market order updates...", s.Symbol)
 		time.Sleep(100 * time.Millisecond * waitFactor)
 		waitFactor++
 	}
@@ -472,6 +473,7 @@ func (s *Strategy) orderWorker(ctx context.Context, session *bbgo.ExchangeSessio
 			return
 		}
 
+		s.activeMakerOrders.Add(createdOrders...)
 		s.orderStore.Add(createdOrders...)
 	}
 }
@@ -485,14 +487,12 @@ func (s *Strategy) CrossRun(ctx context.Context, orderExecutionRouter bbgo.Order
 	s.books = make(map[string]*types.StreamOrderBook)
 	s.markets = make(map[string]types.Market)
 	s.orderStore = bbgo.NewOrderStore(s.Symbol)
+	s.activeMakerOrders = bbgo.NewLocalActiveOrderBook()
 
 	// buffer 100 trades in the channel
 	s.tradeC = make(chan types.Trade, 100)
 	s.tradeStore = bbgo.NewTradeStore(s.Symbol)
 	go s.collectTrades(ctx)
-
-	// we're using market order, market orders will be finally filled
-	s.orderStore.RemoveFilled = true
 
 	s.orderChannels = make(map[string]chan types.SubmitOrder)
 
@@ -519,6 +519,7 @@ func (s *Strategy) CrossRun(ctx context.Context, orderExecutionRouter bbgo.Order
 		session.UserDataStream.OnTradeUpdate(s.handleTrade)
 
 		s.orderStore.BindStream(session.UserDataStream)
+		s.activeMakerOrders.BindStream(session.UserDataStream)
 
 		c := make(chan types.SubmitOrder, 1)
 		s.orderChannels[sessionID] = c
